@@ -19,13 +19,30 @@ test("adding a listener", function(){
   ok(wasCalled, "the listener was called");
 });
 
-test("removing a listener", function(){
-  var wasCalled = false;
-  var listener = xhr.addEventListener('somethingHappened', function(){
-    wasCalled = true;
+test("adding multiple listeners for the same event", function(){
+  var calledOnce = false,
+      calledTwice = false;
+  xhr.addEventListener("somethingHappened", function(){
+    calledOnce = true;
+  });
+  xhr.addEventListener("somethingHappened", function(){
+    calledTwice = true;
   });
 
-  xhr.dispatchEvent({type: 'somethingHappened'});
+  xhr.dispatchEvent({type: "somethingHappened"});
 
-  ok(wasCalled, "the listener was called");
+  ok(calledOnce && calledTwice, "calls each event listener");
+});
+
+test("removing a listener", function(){
+  var wasCalled = false;
+  var callback = function() {
+    wasCalled = true;
+  };
+  xhr.addEventListener("somethingHappened", callback);
+  xhr.removeEventListener("somethingHappened", callback);
+
+  xhr.dispatchEvent({type: "somethingHappened"});
+
+  ok(!wasCalled, "the removed listener was not called");
 });
